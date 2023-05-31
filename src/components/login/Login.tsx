@@ -8,6 +8,7 @@ import { toggleLoginModal, toggleSignupModal } from "../../store/commonSlice";
 import { EUserRoles } from "../../types";
 import { ToastOptions, toast } from "react-toastify";
 import Loader from "../design/loading";
+import { useNavigate } from "react-router-dom";
 
 const ToastProps: ToastOptions<{}> = {
   position: "bottom-right",
@@ -21,30 +22,35 @@ const ToastProps: ToastOptions<{}> = {
 };
 
 const Login = () => {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const { showLoginModal, showSignupModal } = useSelector(
     (state: any) => state.common
   );
-  const { AuthAlert, status } = useSelector((state: any) => state.auth);
+  const { AuthAlert, status, userInfo } = useSelector(
+    (state: any) => state.auth
+  );
 
   useEffect(() => {
-    if (AuthAlert) {
-      if (AuthAlert.type == "success") {
+    // alert("x");
+    if (AuthAlert && userInfo) {
+      if (AuthAlert.type === "success") {
         toast.success(AuthAlert.msg, ToastProps);
         showLoginModal
           ? dispatch(toggleLoginModal())
           : dispatch(toggleSignupModal());
-      } else if (AuthAlert.type == "warn") {
+        navigate(`${userInfo.user_role.substring(0, 1)}`);
+      } else if (AuthAlert.type === "warn") {
         toast.warn(AuthAlert.msg, ToastProps);
-      } else if (AuthAlert.type == "info") {
+      } else if (AuthAlert.type === "info") {
         toast.info(AuthAlert.msg, ToastProps);
-      } else if (AuthAlert.type == "error") {
+      } else if (AuthAlert.type === "error") {
         toast.error(AuthAlert.msg, ToastProps);
       }
       dispatch(resetAuthAlert());
     }
     return () => {};
-  }, [AuthAlert]);
+  }, [AuthAlert, dispatch, navigate, showLoginModal, userInfo]);
 
   const [data, setData] = useState({
     user_email: "",
@@ -172,6 +178,7 @@ const Login = () => {
             label="Who you are?"
             defaultValue="consumer"
             onChange={(e: any) => setData({ ...data, user_role: e })}
+            size="sm"
           >
             <Radio value="consumer" color="primary">
               {getTitle(EUserRoles.consumer)}

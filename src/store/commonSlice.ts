@@ -15,7 +15,7 @@ const commonSlice = createSlice({
   reducers: {
     changeTheme(state) {
       state.theme =
-        ["dark", "light"].filter((e) => e != state.theme).at(0) || state.theme;
+        ["dark", "light"].filter((e) => e !== state.theme).at(0) || state.theme;
     },
     toggleSignupModal(state) {
       state.showSignupModal = !state.showSignupModal;

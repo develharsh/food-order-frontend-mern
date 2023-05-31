@@ -1,6 +1,6 @@
 import "./Navbar.css";
 
-import { useLocation } from "react-router-dom";
+// import { useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { removeAuth } from "../../../store/authSlice";
 import {
@@ -22,13 +22,13 @@ const collapseItems = [
 
 const Header = () => {
   const dispatch = useDispatch();
-  const { isAuthenticated, userInfo } = useSelector((state: any) => state.auth);
-  const location = useLocation();
+  const { isAuthenticated } = useSelector((state: any) => state.auth);
+  // const location = useLocation();
 
-  const isActive = (key: string): string => {
-    if (key === location.pathname) return "active";
-    else return "";
-  };
+  // const isActive = (key: string): string => {
+  //   if (key === location.pathname) return "active";
+  //   else return "";
+  // };
 
   return (
     <Navbar isBordered variant="sticky">

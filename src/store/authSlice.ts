@@ -7,6 +7,7 @@ export const STATUSES = {
   IDLE: "idle",
   LOADING: "loading",
 };
+
 export const ALERTS = {
   NULL: null,
   VALUE: (type: string, msg: string) => Object({ type, msg }),
@@ -15,7 +16,7 @@ export const ALERTS = {
 // Thunks
 export const validateAuthSession: any = createAsyncThunk(
   "auth/session",
-  async (_, { rejectWithValue }) => {
+  async (_ = undefined, { rejectWithValue }) => {
     try {
       const token = cookie.get("authToken");
       const res = await axios({
@@ -77,6 +78,7 @@ const authSlice = createSlice({
   initialState: {
     isAuthenticated: false,
     userInfo: null,
+    AuthState: "INITIAL",
     status: STATUSES.IDLE,
     AuthAlert: ALERTS.NULL,
   },
@@ -84,11 +86,15 @@ const authSlice = createSlice({
     removeAuth(state) {
       state.isAuthenticated = false;
       state.userInfo = null;
+      state.AuthState = "UNAUTH";
       cookie.remove("authToken");
       state.AuthAlert = ALERTS.VALUE("info", "Logged Out Successfully");
     },
     resetAuthAlert(state) {
       state.AuthAlert = ALERTS.NULL;
+    },
+    noToken(state) {
+      state.AuthState = "UNAUTH";
     },
   },
   extraReducers: (builder) => {
@@ -100,12 +106,14 @@ const authSlice = createSlice({
       // console.log("C-session", action.payload);
       state.isAuthenticated = true;
       state.userInfo = action.payload.data;
+      state.AuthState = "AUTH";
     });
     builder.addCase(validateAuthSession.rejected, (state, action) => {
       state.status = STATUSES.IDLE;
       // console.log("hey1", action.payload);
       state.AuthAlert = ALERTS.VALUE("error", action.payload);
       cookie.remove("authToken");
+      state.AuthState = "UNAUTH";
     });
     builder.addCase(login.pending, (state, _) => {
       state.status = STATUSES.LOADING;
@@ -115,6 +123,7 @@ const authSlice = createSlice({
       // console.log("hey1", action.payload);
       state.isAuthenticated = true;
       state.userInfo = action.payload.data;
+      state.AuthState = "AUTH";
       cookie.set("authToken", action.payload.token);
       state.AuthAlert = ALERTS.VALUE("success", action.payload.message);
     });
@@ -131,6 +140,7 @@ const authSlice = createSlice({
       // console.log("hey1", action.payload);
       state.isAuthenticated = true;
       state.userInfo = action.payload.data;
+      state.AuthState = "AUTH";
       cookie.set("authToken", action.payload.token);
       state.AuthAlert = ALERTS.VALUE("success", action.payload.message);
     });
@@ -142,5 +152,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { removeAuth, resetAuthAlert } = authSlice.actions;
+export const { removeAuth, resetAuthAlert, noToken } = authSlice.actions;
 export default authSlice.reducer;

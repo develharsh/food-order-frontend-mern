@@ -7,19 +7,23 @@ import Login from "./components/login/Login";
 import Header from "./components/design/navbar/Navbar";
 import { useDispatch } from "react-redux";
 import { useEffect } from "react";
-import { validateAuthSession } from "./store/authSlice";
+import { noToken, validateAuthSession } from "./store/authSlice";
 import cookie from "js-cookie";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import ConsumerDashboard from "./pages/consumer/dashboard/Dashboard";
 
 function App() {
   const dispatch = useDispatch();
   // const { theme } = useSelector((state: any) => state.common);
+  // const { isAuthenticated, userInfo } = useSelector((state: any) => state.auth);
   const token = cookie.get("authToken");
 
   useEffect(() => {
-    if (token) dispatch(validateAuthSession(null));
-  }, []);
+    // alert("y");
+    if (token) dispatch(validateAuthSession());
+    else dispatch(noToken());
+  }, [dispatch, token]);
 
   return (
     <NextUIProvider>
@@ -30,6 +34,10 @@ function App() {
         <Routes>
           <Route path="/">
             <Route index element={<Home />} />
+            <Route path="c">
+              <Route index element={<ConsumerDashboard />} />
+            </Route>
+            <Route path="*" element={<h1>404</h1>} />
           </Route>
         </Routes>
       </BrowserRouter>
